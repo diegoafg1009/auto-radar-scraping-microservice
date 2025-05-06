@@ -3,9 +3,8 @@ package handlers
 import (
 	"context"
 
-	"github.com/diegoafg1009/auto-radar-scraping-microservice/pkg/genproto/autoscrapper/v1/autoscrapperv1connect"
-
-	v1 "github.com/diegoafg1009/auto-radar-scraping-microservice/pkg/genproto/autoscrapper/v1"
+	v1 "github.com/diegoafg1009/auto-radar-scraping-microservice/pkg/genproto/autoscraper/v1"
+	"github.com/diegoafg1009/auto-radar-scraping-microservice/pkg/genproto/autoscraper/v1/autoscraperv1connect"
 
 	services "github.com/diegoafg1009/auto-radar-scraping-microservice/internal/services/scraper"
 
@@ -14,18 +13,18 @@ import (
 	"connectrpc.com/connect"
 )
 
-type AutoScrapperHandler struct {
-	autoscrapperv1connect.UnimplementedAutoScrapperServiceHandler
-	autoscrapper services.AutoScrapper
+type AutoScraperHandler struct {
+	autoscraperv1connect.UnimplementedAutoScraperServiceHandler
+	autoscraper services.AutoScraper
 }
 
-func NewAutoScrapperHandler(autoscrapper services.AutoScrapper) *AutoScrapperHandler {
-	return &AutoScrapperHandler{
-		autoscrapper: autoscrapper,
+func NewAutoScraperHandler(autoscraper services.AutoScraper) *AutoScraperHandler {
+	return &AutoScraperHandler{
+		autoscraper: autoscraper,
 	}
 }
 
-func (h *AutoScrapperHandler) FindByFilter(ctx context.Context, req *connect.Request[v1.FindByFilterRequest]) (*connect.Response[v1.FindByFilterResponse], error) {
+func (h *AutoScraperHandler) FindByFilter(ctx context.Context, req *connect.Request[v1.FindByFilterRequest]) (*connect.Response[v1.FindByFilterResponse], error) {
 
 	filter := dtos.AutoFilter{
 		Brand:    req.Msg.Brand,
@@ -36,7 +35,7 @@ func (h *AutoScrapperHandler) FindByFilter(ctx context.Context, req *connect.Req
 		MaxPrice: &req.Msg.MaxPrice,
 	}
 
-	autos, _ := h.autoscrapper.FindByFilter(filter)
+	autos, _ := h.autoscraper.FindByFilter(filter)
 
 	var autosResponse []*v1.Auto
 

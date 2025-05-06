@@ -20,19 +20,19 @@ const (
 	loaderImageURL      = "https://cds.neoauto.pe/neoauto3/img/loader_black.gif"
 )
 
-type NeoAutoRodScrapper struct {
+type NeoAutoRodscraper struct {
 	baseURL   string
 	searchURL string
 }
 
-func NewNeoAutoRodScrapper() *NeoAutoRodScrapper {
-	return &NeoAutoRodScrapper{
+func NewNeoAutoRodscraper() *NeoAutoRodscraper {
+	return &NeoAutoRodscraper{
 		baseURL:   neoAutoRodURL,
 		searchURL: neoAutoRodSearchURL,
 	}
 }
 
-func (s *NeoAutoRodScrapper) FindByFilter(filter dtos.AutoFilter) ([]*dtos.AutoFilterResponse, error) {
+func (s *NeoAutoRodscraper) FindByFilter(filter dtos.AutoFilter) ([]*dtos.AutoFilterResponse, error) {
 	autos := make([]*dtos.AutoFilterResponse, 0)
 
 	// Scrape with rod
@@ -134,7 +134,7 @@ func (s *NeoAutoRodScrapper) FindByFilter(filter dtos.AutoFilter) ([]*dtos.AutoF
 	return autos, nil
 }
 
-func (s *NeoAutoRodScrapper) generateURL(filter dtos.AutoFilter) string {
+func (s *NeoAutoRodscraper) generateURL(filter dtos.AutoFilter) string {
 	searchURL := s.searchURL
 
 	// Añadir filtro de marca y modelo si están especificados
@@ -177,7 +177,7 @@ func (s *NeoAutoRodScrapper) generateURL(filter dtos.AutoFilter) string {
 	return searchURL
 }
 
-func (s *NeoAutoRodScrapper) getCarTitle(carResultContent *rod.Element) (string, error) {
+func (s *NeoAutoRodscraper) getCarTitle(carResultContent *rod.Element) (string, error) {
 	titleSelector := "div.c-results__header > h2"
 
 	titleHeader, err := carResultContent.Element(titleSelector)
@@ -193,7 +193,7 @@ func (s *NeoAutoRodScrapper) getCarTitle(carResultContent *rod.Element) (string,
 	return title, nil
 }
 
-func (s *NeoAutoRodScrapper) getCarImageURL(carResultBody *rod.Element) (string, error) {
+func (s *NeoAutoRodscraper) getCarImageURL(carResultBody *rod.Element) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -210,7 +210,7 @@ func (s *NeoAutoRodScrapper) getCarImageURL(carResultBody *rod.Element) (string,
 	return imageURL, nil
 }
 
-func (s *NeoAutoRodScrapper) retryGetImageURL(element *rod.Element, selector string, ctx context.Context) (string, error) {
+func (s *NeoAutoRodscraper) retryGetImageURL(element *rod.Element, selector string, ctx context.Context) (string, error) {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
 
@@ -232,7 +232,7 @@ func (s *NeoAutoRodScrapper) retryGetImageURL(element *rod.Element, selector str
 		}
 	}
 }
-func (s *NeoAutoRodScrapper) getImageURL(element *rod.Element, selector string) (string, error) {
+func (s *NeoAutoRodscraper) getImageURL(element *rod.Element, selector string) (string, error) {
 	imageContainer, err := element.Element(selector)
 
 	if err != nil {
@@ -250,7 +250,7 @@ func (s *NeoAutoRodScrapper) getImageURL(element *rod.Element, selector string) 
 	return *imageURL, nil
 }
 
-func (s *NeoAutoRodScrapper) getCarPrice(carResultDetailContact *rod.Element) (price float64, err error) {
+func (s *NeoAutoRodscraper) getCarPrice(carResultDetailContact *rod.Element) (price float64, err error) {
 	priceSelector := "div.c-results-mount__price"
 
 	textPrice := carResultDetailContact.MustElement(priceSelector).MustText()
@@ -269,7 +269,7 @@ func (s *NeoAutoRodScrapper) getCarPrice(carResultDetailContact *rod.Element) (p
 
 }
 
-func (s *NeoAutoRodScrapper) parsePriceFromText(textPrice string) (price float64, err error) {
+func (s *NeoAutoRodscraper) parsePriceFromText(textPrice string) (price float64, err error) {
 	textPrice = strings.ReplaceAll(textPrice, ",", "")
 	splitedTextPrice := strings.Split(textPrice, " ")
 	price, err = strconv.ParseFloat(splitedTextPrice[len(splitedTextPrice)-1], 64)

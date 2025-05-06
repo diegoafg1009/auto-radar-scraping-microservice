@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        (unknown)
-// source: autoscrapper/v1/autoscrapper.proto
+// source: autoscraper/v1/autoscraper.proto
 
-package autoscrapperv1
+package autoscraperv1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -35,7 +35,7 @@ type FindByFilterRequest struct {
 
 func (x *FindByFilterRequest) Reset() {
 	*x = FindByFilterRequest{}
-	mi := &file_autoscrapper_v1_autoscrapper_proto_msgTypes[0]
+	mi := &file_autoscraper_v1_autoscraper_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -47,7 +47,7 @@ func (x *FindByFilterRequest) String() string {
 func (*FindByFilterRequest) ProtoMessage() {}
 
 func (x *FindByFilterRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_autoscrapper_v1_autoscrapper_proto_msgTypes[0]
+	mi := &file_autoscraper_v1_autoscraper_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -60,7 +60,7 @@ func (x *FindByFilterRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FindByFilterRequest.ProtoReflect.Descriptor instead.
 func (*FindByFilterRequest) Descriptor() ([]byte, []int) {
-	return file_autoscrapper_v1_autoscrapper_proto_rawDescGZIP(), []int{0}
+	return file_autoscraper_v1_autoscraper_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *FindByFilterRequest) GetBrand() string {
@@ -117,7 +117,7 @@ type Auto struct {
 
 func (x *Auto) Reset() {
 	*x = Auto{}
-	mi := &file_autoscrapper_v1_autoscrapper_proto_msgTypes[1]
+	mi := &file_autoscraper_v1_autoscraper_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -129,7 +129,7 @@ func (x *Auto) String() string {
 func (*Auto) ProtoMessage() {}
 
 func (x *Auto) ProtoReflect() protoreflect.Message {
-	mi := &file_autoscrapper_v1_autoscrapper_proto_msgTypes[1]
+	mi := &file_autoscraper_v1_autoscraper_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -142,7 +142,7 @@ func (x *Auto) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Auto.ProtoReflect.Descriptor instead.
 func (*Auto) Descriptor() ([]byte, []int) {
-	return file_autoscrapper_v1_autoscrapper_proto_rawDescGZIP(), []int{1}
+	return file_autoscraper_v1_autoscraper_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Auto) GetTitle() string {
@@ -182,7 +182,7 @@ type FindByFilterResponse struct {
 
 func (x *FindByFilterResponse) Reset() {
 	*x = FindByFilterResponse{}
-	mi := &file_autoscrapper_v1_autoscrapper_proto_msgTypes[2]
+	mi := &file_autoscraper_v1_autoscraper_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -194,7 +194,7 @@ func (x *FindByFilterResponse) String() string {
 func (*FindByFilterResponse) ProtoMessage() {}
 
 func (x *FindByFilterResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_autoscrapper_v1_autoscrapper_proto_msgTypes[2]
+	mi := &file_autoscraper_v1_autoscraper_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -207,7 +207,7 @@ func (x *FindByFilterResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FindByFilterResponse.ProtoReflect.Descriptor instead.
 func (*FindByFilterResponse) Descriptor() ([]byte, []int) {
-	return file_autoscrapper_v1_autoscrapper_proto_rawDescGZIP(), []int{2}
+	return file_autoscraper_v1_autoscraper_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *FindByFilterResponse) GetAutos() []*Auto {
@@ -217,11 +217,11 @@ func (x *FindByFilterResponse) GetAutos() []*Auto {
 	return nil
 }
 
-var File_autoscrapper_v1_autoscrapper_proto protoreflect.FileDescriptor
+var File_autoscraper_v1_autoscraper_proto protoreflect.FileDescriptor
 
-const file_autoscrapper_v1_autoscrapper_proto_rawDesc = "" +
+const file_autoscraper_v1_autoscraper_proto_rawDesc = "" +
 	"\n" +
-	"\"autoscrapper/v1/autoscrapper.proto\x12\x0fautoscrapper.v1\"\xb1\x01\n" +
+	" autoscraper/v1/autoscraper.proto\x12\x0eautoscraper.v1\"\xb1\x01\n" +
 	"\x13FindByFilterRequest\x12\x14\n" +
 	"\x05brand\x18\x01 \x01(\tR\x05brand\x12\x14\n" +
 	"\x05model\x18\x02 \x01(\tR\x05model\x12\x19\n" +
@@ -233,35 +233,35 @@ const file_autoscrapper_v1_autoscrapper_proto_rawDesc = "" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x14\n" +
 	"\x05price\x18\x02 \x01(\x01R\x05price\x12\x1b\n" +
 	"\timage_url\x18\x03 \x01(\tR\bimageUrl\x12\x10\n" +
-	"\x03url\x18\x04 \x01(\tR\x03url\"C\n" +
-	"\x14FindByFilterResponse\x12+\n" +
-	"\x05autos\x18\x01 \x03(\v2\x15.autoscrapper.v1.AutoR\x05autos2t\n" +
-	"\x13AutoScrapperService\x12]\n" +
-	"\fFindByFilter\x12$.autoscrapper.v1.FindByFilterRequest\x1a%.autoscrapper.v1.FindByFilterResponse\"\x00B\xeb\x01\n" +
-	"\x13com.autoscrapper.v1B\x11AutoscrapperProtoP\x01Zdgithub.com/diegoafg1009/auto-radar-scraping-microservice/pkg/genproto/autoscrapper/v1;autoscrapperv1\xa2\x02\x03AXX\xaa\x02\x0fAutoscrapper.V1\xca\x02\x0fAutoscrapper\\V1\xe2\x02\x1bAutoscrapper\\V1\\GPBMetadata\xea\x02\x10Autoscrapper::V1b\x06proto3"
+	"\x03url\x18\x04 \x01(\tR\x03url\"B\n" +
+	"\x14FindByFilterResponse\x12*\n" +
+	"\x05autos\x18\x01 \x03(\v2\x14.autoscraper.v1.AutoR\x05autos2q\n" +
+	"\x12AutoScraperService\x12[\n" +
+	"\fFindByFilter\x12#.autoscraper.v1.FindByFilterRequest\x1a$.autoscraper.v1.FindByFilterResponse\"\x00B\xe3\x01\n" +
+	"\x12com.autoscraper.v1B\x10AutoscraperProtoP\x01Zbgithub.com/diegoafg1009/auto-radar-scraping-microservice/pkg/genproto/autoscraper/v1;autoscraperv1\xa2\x02\x03AXX\xaa\x02\x0eAutoscraper.V1\xca\x02\x0eAutoscraper\\V1\xe2\x02\x1aAutoscraper\\V1\\GPBMetadata\xea\x02\x0fAutoscraper::V1b\x06proto3"
 
 var (
-	file_autoscrapper_v1_autoscrapper_proto_rawDescOnce sync.Once
-	file_autoscrapper_v1_autoscrapper_proto_rawDescData []byte
+	file_autoscraper_v1_autoscraper_proto_rawDescOnce sync.Once
+	file_autoscraper_v1_autoscraper_proto_rawDescData []byte
 )
 
-func file_autoscrapper_v1_autoscrapper_proto_rawDescGZIP() []byte {
-	file_autoscrapper_v1_autoscrapper_proto_rawDescOnce.Do(func() {
-		file_autoscrapper_v1_autoscrapper_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_autoscrapper_v1_autoscrapper_proto_rawDesc), len(file_autoscrapper_v1_autoscrapper_proto_rawDesc)))
+func file_autoscraper_v1_autoscraper_proto_rawDescGZIP() []byte {
+	file_autoscraper_v1_autoscraper_proto_rawDescOnce.Do(func() {
+		file_autoscraper_v1_autoscraper_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_autoscraper_v1_autoscraper_proto_rawDesc), len(file_autoscraper_v1_autoscraper_proto_rawDesc)))
 	})
-	return file_autoscrapper_v1_autoscrapper_proto_rawDescData
+	return file_autoscraper_v1_autoscraper_proto_rawDescData
 }
 
-var file_autoscrapper_v1_autoscrapper_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_autoscrapper_v1_autoscrapper_proto_goTypes = []any{
-	(*FindByFilterRequest)(nil),  // 0: autoscrapper.v1.FindByFilterRequest
-	(*Auto)(nil),                 // 1: autoscrapper.v1.Auto
-	(*FindByFilterResponse)(nil), // 2: autoscrapper.v1.FindByFilterResponse
+var file_autoscraper_v1_autoscraper_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_autoscraper_v1_autoscraper_proto_goTypes = []any{
+	(*FindByFilterRequest)(nil),  // 0: autoscraper.v1.FindByFilterRequest
+	(*Auto)(nil),                 // 1: autoscraper.v1.Auto
+	(*FindByFilterResponse)(nil), // 2: autoscraper.v1.FindByFilterResponse
 }
-var file_autoscrapper_v1_autoscrapper_proto_depIdxs = []int32{
-	1, // 0: autoscrapper.v1.FindByFilterResponse.autos:type_name -> autoscrapper.v1.Auto
-	0, // 1: autoscrapper.v1.AutoScrapperService.FindByFilter:input_type -> autoscrapper.v1.FindByFilterRequest
-	2, // 2: autoscrapper.v1.AutoScrapperService.FindByFilter:output_type -> autoscrapper.v1.FindByFilterResponse
+var file_autoscraper_v1_autoscraper_proto_depIdxs = []int32{
+	1, // 0: autoscraper.v1.FindByFilterResponse.autos:type_name -> autoscraper.v1.Auto
+	0, // 1: autoscraper.v1.AutoScraperService.FindByFilter:input_type -> autoscraper.v1.FindByFilterRequest
+	2, // 2: autoscraper.v1.AutoScraperService.FindByFilter:output_type -> autoscraper.v1.FindByFilterResponse
 	2, // [2:3] is the sub-list for method output_type
 	1, // [1:2] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -269,26 +269,26 @@ var file_autoscrapper_v1_autoscrapper_proto_depIdxs = []int32{
 	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_autoscrapper_v1_autoscrapper_proto_init() }
-func file_autoscrapper_v1_autoscrapper_proto_init() {
-	if File_autoscrapper_v1_autoscrapper_proto != nil {
+func init() { file_autoscraper_v1_autoscraper_proto_init() }
+func file_autoscraper_v1_autoscraper_proto_init() {
+	if File_autoscraper_v1_autoscraper_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_autoscrapper_v1_autoscrapper_proto_rawDesc), len(file_autoscrapper_v1_autoscrapper_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_autoscraper_v1_autoscraper_proto_rawDesc), len(file_autoscraper_v1_autoscraper_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_autoscrapper_v1_autoscrapper_proto_goTypes,
-		DependencyIndexes: file_autoscrapper_v1_autoscrapper_proto_depIdxs,
-		MessageInfos:      file_autoscrapper_v1_autoscrapper_proto_msgTypes,
+		GoTypes:           file_autoscraper_v1_autoscraper_proto_goTypes,
+		DependencyIndexes: file_autoscraper_v1_autoscraper_proto_depIdxs,
+		MessageInfos:      file_autoscraper_v1_autoscraper_proto_msgTypes,
 	}.Build()
-	File_autoscrapper_v1_autoscrapper_proto = out.File
-	file_autoscrapper_v1_autoscrapper_proto_goTypes = nil
-	file_autoscrapper_v1_autoscrapper_proto_depIdxs = nil
+	File_autoscraper_v1_autoscraper_proto = out.File
+	file_autoscraper_v1_autoscraper_proto_goTypes = nil
+	file_autoscraper_v1_autoscraper_proto_depIdxs = nil
 }
