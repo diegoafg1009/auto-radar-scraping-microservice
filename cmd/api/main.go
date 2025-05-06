@@ -9,10 +9,10 @@ import (
 	"syscall"
 	"time"
 
-	"auto-scraping/internal/server"
+	"github.com/diegoafg1009/auto-radar-scraping-microservice/internal/server"
 )
 
-func gracefulShutdown(apiServer *http.Server, done chan bool) {
+func gracefulShutdown(apiServer *server.Server, done chan bool) {
 	// Create context that listens for the interrupt signal from the OS.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
