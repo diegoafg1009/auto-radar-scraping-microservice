@@ -20,6 +20,7 @@ message Auto {
   double price = 2;
   string image_url = 3;
   string url = 4;
+  uint32 year = 5;
 }
 
 message FindByFilterResponse {

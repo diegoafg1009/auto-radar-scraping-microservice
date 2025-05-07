@@ -13,7 +13,7 @@ import (
 func (s *Server) RegisterRoutes() http.Handler {
 	mux := http.NewServeMux()
 
-	path, handler := autoscraperv1connect.NewAutoScraperServiceHandler(handlers.NewAutoScraperHandler(services.NewNeoAutoRodscraper()))
+	path, handler := autoscraperv1connect.NewAutoScraperServiceHandler(handlers.NewAutoScraperHandler(services.NewNeoAutoScraper(s.db)))
 
 	mux.Handle(path, handler)
 

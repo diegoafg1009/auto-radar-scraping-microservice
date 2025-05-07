@@ -9,33 +9,123 @@ import (
 	"strings"
 	"time"
 
+	"github.com/diegoafg1009/auto-radar-scraping-microservice/internal"
+	"github.com/diegoafg1009/auto-radar-scraping-microservice/internal/database"
 	"github.com/diegoafg1009/auto-radar-scraping-microservice/internal/dtos"
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
 )
 
 const (
-	neoAutoRodURL       = "https://www.neoauto.com/"
-	neoAutoRodSearchURL = neoAutoRodURL + "venta-de-autos-usados"
-	loaderImageURL      = "https://cds.neoauto.pe/neoauto3/img/loader_black.gif"
+	neoAutoURL       = "https://www.neoauto.com/"
+	neoAutoSearchURL = neoAutoURL + "venta-de-autos-usados"
+	loaderImageURL   = "https://cds.neoauto.pe/neoauto3/img/loader_black.gif"
 )
 
-type NeoAutoRodscraper struct {
+type NeoAutoScraper struct {
 	baseURL   string
 	searchURL string
+	db        database.Service
 }
 
-func NewNeoAutoRodscraper() *NeoAutoRodscraper {
-	return &NeoAutoRodscraper{
-		baseURL:   neoAutoRodURL,
-		searchURL: neoAutoRodSearchURL,
+func NewNeoAutoScraper(db database.Service) *NeoAutoScraper {
+	return &NeoAutoScraper{
+		baseURL:   neoAutoURL,
+		searchURL: neoAutoSearchURL,
+		db:        db,
 	}
 }
 
-func (s *NeoAutoRodscraper) FindByFilter(filter dtos.AutoFilter) ([]*dtos.AutoFilterResponse, error) {
+func (s *NeoAutoScraper) FindByFilter(filter dtos.AutoFilter) ([]*dtos.AutoFilterResponse, error) {
+	autos, alreadyFiltered, err := s.getAutos(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	if alreadyFiltered {
+		log.Println("Found", len(autos), "cars in cache")
+		return autos, nil
+	}
+
+	autos = s.filterAutos(filter, autos)
+
+	log.Println("Found", len(autos), "cars")
+
+	complexFilteredRedisKey := generateComplexFilteredNeoAutosRedisKey(filter)
+
+	s.saveAutosToCache(complexFilteredRedisKey, autos)
+
+	return autos, nil
+}
+
+func (s *NeoAutoScraper) getAutos(filter dtos.AutoFilter) (autos []*dtos.AutoFilterResponse, alreadyFiltered bool, err error) {
+	autos, alreadyFiltered, err = s.getAutosFromCache(filter)
+
+	if err == nil {
+		return autos, alreadyFiltered, nil
+	}
+
+	autos, err = s.scrapeAutos(filter)
+	if err != nil {
+		return nil, false, err
+	}
+
+	simpleFilteredRedisKey := generateSimpleFilteredNeoAutosRedisKey(filter)
+
+	s.saveAutosToCache(simpleFilteredRedisKey, autos)
+
+	return autos, alreadyFiltered, err
+}
+
+func (s *NeoAutoScraper) filterAutos(filter dtos.AutoFilter, autos []*dtos.AutoFilterResponse) []*dtos.AutoFilterResponse {
+	filteredAutos := make([]*dtos.AutoFilterResponse, 0)
+
+	for _, auto := range autos {
+		if *filter.MinPrice != 0 && auto.Price < *filter.MinPrice {
+			continue
+		}
+		if *filter.MaxPrice != 0 && auto.Price > *filter.MaxPrice {
+			continue
+		}
+		if *filter.MinYear != 0 && auto.Year < *filter.MinYear {
+			continue
+		}
+		if *filter.MaxYear != 0 && auto.Year > *filter.MaxYear {
+			continue
+		}
+		filteredAutos = append(filteredAutos, auto)
+	}
+
+	return filteredAutos
+}
+
+func (s *NeoAutoScraper) getAutosFromCache(filter dtos.AutoFilter) (autos []*dtos.AutoFilterResponse, alreadyFiltered bool, err error) {
+	complexFilteredRedisKey := generateComplexFilteredNeoAutosRedisKey(filter)
+	err = s.db.GetJson(complexFilteredRedisKey, &autos)
+	if err == nil {
+		return autos, true, nil
+	}
+
+	simpleFilteredRedisKey := generateSimpleFilteredNeoAutosRedisKey(filter)
+	err = s.db.GetJson(simpleFilteredRedisKey, &autos)
+	if err != nil {
+		return nil, false, err
+	}
+
+	return autos, false, nil
+}
+
+func (s *NeoAutoScraper) saveAutosToCache(redisKey string, autos []*dtos.AutoFilterResponse) error {
+	err := s.db.SaveJsonWithTTL(redisKey, &autos, 1*time.Hour)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *NeoAutoScraper) scrapeAutos(filter dtos.AutoFilter) ([]*dtos.AutoFilterResponse, error) {
 	autos := make([]*dtos.AutoFilterResponse, 0)
 
-	// Scrape with rod
 	path, hasLauncher := launcher.LookPath()
 	if !hasLauncher {
 		return nil, errors.New("launcher not found")
@@ -89,7 +179,7 @@ func (s *NeoAutoRodscraper) FindByFilter(filter dtos.AutoFilter) ([]*dtos.AutoFi
 
 			content := carArticle.MustElement(contentSelector)
 
-			title, err := s.getCarTitle(content)
+			title, year, err := s.getCarTitleAndYear(content)
 			if err != nil {
 				continue
 			}
@@ -119,6 +209,7 @@ func (s *NeoAutoRodscraper) FindByFilter(filter dtos.AutoFilter) ([]*dtos.AutoFi
 
 			autos = append(autos, &dtos.AutoFilterResponse{
 				Title:    title,
+				Year:     year,
 				URL:      s.baseURL + *url,
 				ImageURL: imageURL,
 				Price:    price,
@@ -129,12 +220,10 @@ func (s *NeoAutoRodscraper) FindByFilter(filter dtos.AutoFilter) ([]*dtos.AutoFi
 		return nil
 	}).MustDo()
 
-	log.Println("Found", len(autos), "cars")
-
 	return autos, nil
 }
 
-func (s *NeoAutoRodscraper) generateURL(filter dtos.AutoFilter) string {
+func (s *NeoAutoScraper) generateURL(filter dtos.AutoFilter) string {
 	searchURL := s.searchURL
 
 	// Añadir filtro de marca y modelo si están especificados
@@ -150,50 +239,36 @@ func (s *NeoAutoRodscraper) generateURL(filter dtos.AutoFilter) string {
 		}
 	}
 
-	// Construir los parámetros de consulta
-	params := make([]string, 0)
-
-	if filter.MinYear != nil && *filter.MinYear > 0 {
-		params = append(params, fmt.Sprintf("anio_min=%d", *filter.MinYear))
-	}
-
-	if filter.MaxYear != nil && *filter.MaxYear > 0 {
-		params = append(params, fmt.Sprintf("anio_max=%d", *filter.MaxYear))
-	}
-
-	if filter.MinPrice != nil && *filter.MinPrice > 0 {
-		params = append(params, fmt.Sprintf("precio_min=%.0f", *filter.MinPrice))
-	}
-
-	if filter.MaxPrice != nil && *filter.MaxPrice > 0 {
-		params = append(params, fmt.Sprintf("precio_max=%.0f", *filter.MaxPrice))
-	}
-
-	// Si hay parámetros, añadirlos a la URL
-	if len(params) > 0 {
-		searchURL += "?" + strings.Join(params, "&")
-	}
-
 	return searchURL
 }
 
-func (s *NeoAutoRodscraper) getCarTitle(carResultContent *rod.Element) (string, error) {
+func (s *NeoAutoScraper) getCarTitleAndYear(carResultContent *rod.Element) (title string, year uint32, err error) {
 	titleSelector := "div.c-results__header > h2"
 
 	titleHeader, err := carResultContent.Element(titleSelector)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
-	title, err := titleHeader.Text()
+	title, err = titleHeader.Text()
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
-	return title, nil
+	title = strings.TrimSpace(title)
+
+	// year is the last 4 characters of the title
+	yearText := title[len(title)-4:]
+
+	year, err = internal.StringToUint32(yearText)
+	if err != nil {
+		return "", 0, err
+	}
+
+	return title, year, nil
 }
 
-func (s *NeoAutoRodscraper) getCarImageURL(carResultBody *rod.Element) (string, error) {
+func (s *NeoAutoScraper) getCarImageURL(carResultBody *rod.Element) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -210,7 +285,7 @@ func (s *NeoAutoRodscraper) getCarImageURL(carResultBody *rod.Element) (string, 
 	return imageURL, nil
 }
 
-func (s *NeoAutoRodscraper) retryGetImageURL(element *rod.Element, selector string, ctx context.Context) (string, error) {
+func (s *NeoAutoScraper) retryGetImageURL(element *rod.Element, selector string, ctx context.Context) (string, error) {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
 
@@ -232,7 +307,7 @@ func (s *NeoAutoRodscraper) retryGetImageURL(element *rod.Element, selector stri
 		}
 	}
 }
-func (s *NeoAutoRodscraper) getImageURL(element *rod.Element, selector string) (string, error) {
+func (s *NeoAutoScraper) getImageURL(element *rod.Element, selector string) (string, error) {
 	imageContainer, err := element.Element(selector)
 
 	if err != nil {
@@ -250,7 +325,7 @@ func (s *NeoAutoRodscraper) getImageURL(element *rod.Element, selector string) (
 	return *imageURL, nil
 }
 
-func (s *NeoAutoRodscraper) getCarPrice(carResultDetailContact *rod.Element) (price float64, err error) {
+func (s *NeoAutoScraper) getCarPrice(carResultDetailContact *rod.Element) (price float64, err error) {
 	priceSelector := "div.c-results-mount__price"
 
 	textPrice := carResultDetailContact.MustElement(priceSelector).MustText()
@@ -269,7 +344,7 @@ func (s *NeoAutoRodscraper) getCarPrice(carResultDetailContact *rod.Element) (pr
 
 }
 
-func (s *NeoAutoRodscraper) parsePriceFromText(textPrice string) (price float64, err error) {
+func (s *NeoAutoScraper) parsePriceFromText(textPrice string) (price float64, err error) {
 	textPrice = strings.ReplaceAll(textPrice, ",", "")
 	splitedTextPrice := strings.Split(textPrice, " ")
 	price, err = strconv.ParseFloat(splitedTextPrice[len(splitedTextPrice)-1], 64)
@@ -278,4 +353,31 @@ func (s *NeoAutoRodscraper) parsePriceFromText(textPrice string) (price float64,
 	}
 
 	return price, nil
+}
+
+func generateSimpleFilteredNeoAutosRedisKey(filter dtos.AutoFilter) string {
+	return fmt.Sprintf("neo-auto:%s:%s", filter.Brand, filter.Model)
+}
+
+func generateComplexFilteredNeoAutosRedisKey(filter dtos.AutoFilter) string {
+	minPrice := 0.0
+	maxPrice := 0.0
+	minYear := uint32(0)
+	maxYear := uint32(0)
+
+	if filter.MinPrice != nil {
+		minPrice = *filter.MinPrice
+	}
+	if filter.MaxPrice != nil {
+		maxPrice = *filter.MaxPrice
+	}
+	if filter.MinYear != nil {
+		minYear = *filter.MinYear
+	}
+	if filter.MaxYear != nil {
+		maxYear = *filter.MaxYear
+	}
+
+	return fmt.Sprintf("neo-auto:%s:%s:min-price:%.2f:max-price:%.2f:min-year:%d:max-year:%d",
+		filter.Brand, filter.Model, minPrice, maxPrice, minYear, maxYear)
 }

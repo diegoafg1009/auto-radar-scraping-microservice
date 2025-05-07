@@ -14,4 +14,5 @@ type AutoFilterResponse struct {
 	Price    float64 `json:"price"`
 	URL      string  `json:"url"`
 	ImageURL string  `json:"image_url"`
+	Year     uint32  `json:"year"`
 }

@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math"
@@ -16,6 +17,9 @@ import (
 
 type Service interface {
 	Health() map[string]string
+	SaveJson(key string, value interface{}) error
+	SaveJsonWithTTL(key string, value interface{}, ttl time.Duration) error
+	GetJson(key string, holder interface{}) error
 }
 
 type service struct {
@@ -51,6 +55,35 @@ func New() Service {
 	s := &service{db: rdb}
 
 	return s
+}
+
+func (s *service) SaveJson(key string, value interface{}) error {
+	json, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+	return s.db.Set(context.Background(), key, json, 0).Err()
+}
+
+func (s *service) SaveJsonWithTTL(key string, value interface{}, ttl time.Duration) error {
+	json, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+	return s.db.Set(context.Background(), key, json, ttl).Err()
+}
+
+func (s *service) GetJson(key string, holder interface{}) error {
+	val, err := s.db.Get(context.Background(), key).Result()
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal([]byte(val), &holder)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Health returns the health status and statistics of the Redis server.

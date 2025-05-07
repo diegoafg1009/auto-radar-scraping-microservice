@@ -45,6 +45,7 @@ func (h *AutoScraperHandler) FindByFilter(ctx context.Context, req *connect.Requ
 			Price:    auto.Price,
 			Url:      auto.URL,
 			ImageUrl: auto.ImageURL,
+			Year:     auto.Year,
 		})
 	}
 

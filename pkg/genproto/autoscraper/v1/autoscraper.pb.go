@@ -111,6 +111,7 @@ type Auto struct {
 	Price         float64                `protobuf:"fixed64,2,opt,name=price,proto3" json:"price,omitempty"`
 	ImageUrl      string                 `protobuf:"bytes,3,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
 	Url           string                 `protobuf:"bytes,4,opt,name=url,proto3" json:"url,omitempty"`
+	Year          uint32                 `protobuf:"varint,5,opt,name=year,proto3" json:"year,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -173,6 +174,13 @@ func (x *Auto) GetUrl() string {
 	return ""
 }
 
+func (x *Auto) GetYear() uint32 {
+	if x != nil {
+		return x.Year
+	}
+	return 0
+}
+
 type FindByFilterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Autos         []*Auto                `protobuf:"bytes,1,rep,name=autos,proto3" json:"autos,omitempty"`
@@ -228,12 +236,13 @@ const file_autoscraper_v1_autoscraper_proto_rawDesc = "" +
 	"\bmin_year\x18\x03 \x01(\rR\aminYear\x12\x19\n" +
 	"\bmax_year\x18\x04 \x01(\rR\amaxYear\x12\x1b\n" +
 	"\tmin_price\x18\x05 \x01(\x01R\bminPrice\x12\x1b\n" +
-	"\tmax_price\x18\x06 \x01(\x01R\bmaxPrice\"a\n" +
+	"\tmax_price\x18\x06 \x01(\x01R\bmaxPrice\"u\n" +
 	"\x04Auto\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x14\n" +
 	"\x05price\x18\x02 \x01(\x01R\x05price\x12\x1b\n" +
 	"\timage_url\x18\x03 \x01(\tR\bimageUrl\x12\x10\n" +
-	"\x03url\x18\x04 \x01(\tR\x03url\"B\n" +
+	"\x03url\x18\x04 \x01(\tR\x03url\x12\x12\n" +
+	"\x04year\x18\x05 \x01(\rR\x04year\"B\n" +
 	"\x14FindByFilterResponse\x12*\n" +
 	"\x05autos\x18\x01 \x03(\v2\x14.autoscraper.v1.AutoR\x05autos2q\n" +
 	"\x12AutoScraperService\x12[\n" +
