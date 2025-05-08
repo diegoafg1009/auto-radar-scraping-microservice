@@ -3,4 +3,4 @@ services:
     image: redis:7.2.4
     restart: unless-stopped
     ports:
-      - "${BLUEPRINT_DB_PORT}:6379"
+      - "${REDIS_DB_PORT}:6379"

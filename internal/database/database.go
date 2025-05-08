@@ -27,10 +27,10 @@ type service struct {
 }
 
 var (
-	address  = os.Getenv("BLUEPRINT_DB_ADDRESS")
-	port     = os.Getenv("BLUEPRINT_DB_PORT")
-	password = os.Getenv("BLUEPRINT_DB_PASSWORD")
-	database = os.Getenv("BLUEPRINT_DB_DATABASE")
+	address  = os.Getenv("REDIS_DB_ADDRESS")
+	port     = os.Getenv("REDIS_DB_PORT")
+	password = os.Getenv("REDIS_DB_PASSWORD")
+	database = os.Getenv("REDIS_DB_DATABASE")
 )
 
 func New() Service {
