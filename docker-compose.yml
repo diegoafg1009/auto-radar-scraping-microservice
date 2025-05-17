@@ -1,6 +1,46 @@
 services:
+  scraping-microservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - 8080
+    environment:
+      - PORT=8080
+      - REDIS_DB_ADDRESS=redis_bp
+      - REDIS_DB_PORT=${REDIS_DB_PORT}
+      - REDIS_DB_PASSWORD=${REDIS_DB_PASSWORD}
+      - REDIS_DB_DATABASE=${REDIS_DB_DATABASE}
+    depends_on:
+      redis_bp:
+        condition: service_healthy
+    networks:
+      - dokploy-network
+
   redis_bp:
     image: redis:7.2.4
     restart: unless-stopped
-    ports:
-      - "${REDIS_DB_PORT}:6379"
+    expose:
+      - ${REDIS_DB_PORT}
+    environment:
+      - REDIS_DB_PASSWORD=${REDIS_DB_PASSWORD}
+    command: >
+      redis-server --requirepass ${REDIS_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    volumes:
+      - redis_data:/data
+    networks:
+      - dokploy-network
+
+volumes:
+  redis_data:
+
+networks:
+  dokploy-network:
+    external: true
